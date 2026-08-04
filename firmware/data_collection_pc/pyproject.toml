@@ -1,0 +1,16 @@
+[project]
+name = "serial-port-app"
+version = "0.1.0"
+description = "Serial port upper computer template for testing embedded devices"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pyserial>=3.5",
+    "pyside6>=6.9.1",
+]
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.20.0",
+    "pillow>=12.1.1",
+]

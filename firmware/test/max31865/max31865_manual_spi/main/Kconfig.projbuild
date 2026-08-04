@@ -1,0 +1,52 @@
+menu "Example configuration"
+
+    config EXAMPLE_RTD_NOMINAL
+        int "RTD nominal, Ohms"
+        default 100
+
+    config EXAMPLE_RTD_REF
+        int "Reference resistor value, Ohms"
+        default 400
+        help
+            The reference resistor value on the MAX31865 board. 
+            Common values are 400 Ohms (for PT100) or 430 Ohms.
+
+    choice EXAMPLE_FILTER
+        prompt "Select notch frequency for the noise rejection filter"
+        default EXAMPLE_FILTER_50
+        config EXAMPLE_FILTER_50
+            bool "50 Hz"
+        config EXAMPLE_FILTER_60
+            bool "60 Hz"
+    endchoice
+
+    config EXAMPLE_MOSI_GPIO
+        int "SPI MOSI GPIO Number"
+        default 4 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 4 if IDF_TARGET_ESP32H2
+        default 4 if IDF_TARGET_ESP32P4
+        default 23 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+
+    config EXAMPLE_MISO_GPIO
+        int "SPI MISO GPIO Number"
+        default 5 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 5 if IDF_TARGET_ESP32H2
+        default 5 if IDF_TARGET_ESP32P4
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+
+    config EXAMPLE_SCLK_GPIO
+        int "SPI SCLK GPIO Number"
+        default 6 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 6 if IDF_TARGET_ESP32H2
+        default 6 if IDF_TARGET_ESP32P4
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+
+    config EXAMPLE_CS_GPIO
+        int "SPI CS GPIO Number"
+        default 7 if IDF_TARGET_ESP32C3
+        default 7 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 7 if IDF_TARGET_ESP32H2
+        default 7 if IDF_TARGET_ESP32P4
+        default 15 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+
+endmenu

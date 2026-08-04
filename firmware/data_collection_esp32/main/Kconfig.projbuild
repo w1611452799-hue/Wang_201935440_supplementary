@@ -1,0 +1,166 @@
+menu "Data Collection - Sensor Configuration"
+
+    config DC_RTD_NOMINAL
+        int "PT100 RTD nominal resistance (Ohms)"
+        default 100
+        help
+            RTD nominal resistance at 0°C.
+            PT100 = 100 Ohms, PT1000 = 1000 Ohms.
+
+    config DC_RTD_REF
+        int "MAX31865 reference resistor (Ohms)"
+        default 400
+        help
+            The reference resistor value on the MAX31865 module board.
+            Common values:
+            - 400 Ω (standard PT100 module)
+            - 430 Ω (common alternative)
+            - 4300 Ω (PT1000 module)
+            Check the marking on your MAX31865 board's reference resistor
+            (typically a precision resistor labeled "4300" or "4000").
+
+    config DC_SPI_MOSI
+        int "SPI MOSI GPIO"
+        default 23 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        default 4 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 4 if IDF_TARGET_ESP32H2
+        default 4 if IDF_TARGET_ESP32P4
+
+    config DC_SPI_MISO
+        int "SPI MISO GPIO"
+        default 19 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        default 5 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 5 if IDF_TARGET_ESP32H2
+        default 5 if IDF_TARGET_ESP32P4
+
+    config DC_SPI_SCLK
+        int "SPI SCLK GPIO"
+        default 18 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        default 6 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 6 if IDF_TARGET_ESP32H2
+        default 6 if IDF_TARGET_ESP32P4
+
+    config DC_SPI_CS
+        int "SPI CS GPIO"
+        default 15 if IDF_TARGET_ESP32 || IDF_TARGET_ESP32S2 || IDF_TARGET_ESP32S3
+        default 7 if IDF_TARGET_ESP32C2 || IDF_TARGET_ESP32C3 || IDF_TARGET_ESP32C5 || IDF_TARGET_ESP32C6 || IDF_TARGET_ESP32C61
+        default 7 if IDF_TARGET_ESP32H2
+        default 7 if IDF_TARGET_ESP32P4
+
+endmenu
+
+menu "Data Collection - LCD Display (ST7789)"
+
+    config DC_LCD_ENABLE
+        bool "Enable ST7789 LCD display"
+        default y
+        help
+            Enable ST7789 135x240 LCD display for real-time sensor
+            data visualization.  Disable this if you don't have a
+            screen connected — the firmware will work normally
+            without it.
+
+            When enabled but no screen is physically attached, the
+            init sequence will fail gracefully and data collection
+            continues over serial only.
+
+    config DC_LCD_SPI_HOST
+        int "LCD SPI host"
+        default 2
+        help
+            SPI host number for the LCD.
+            ESP32:   SPI2_HOST=1(HSPI), SPI3_HOST=2(VSPI)
+            ESP32-S3: SPI2_HOST=1(FSPI), SPI3_HOST=2
+            Must be different from the MAX31865 SPI host.
+            Default 2 (SPI3_HOST) to avoid conflict with MAX31865.
+        depends on DC_LCD_ENABLE
+        help
+            SPI host for the LCD.
+            Must be different from the MAX31865 SPI host.
+            ESP32:   HSPI=2, VSPI=3
+            ESP32-S3: SPI2_HOST=2, SPI3_HOST=3
+
+    config DC_LCD_PIN_SCLK
+        int "LCD SCLK GPIO"
+        default 5 if IDF_TARGET_ESP32
+        default 12 if IDF_TARGET_ESP32S3
+        depends on DC_LCD_ENABLE
+
+    config DC_LCD_PIN_MOSI
+        int "LCD MOSI GPIO"
+        default 16 if IDF_TARGET_ESP32
+        default 11 if IDF_TARGET_ESP32S3
+        depends on DC_LCD_ENABLE
+
+    config DC_LCD_PIN_MISO
+        int "LCD MISO GPIO (-1 = not connected)"
+        default -1
+        depends on DC_LCD_ENABLE
+
+    config DC_LCD_PIN_DC
+        int "LCD DC (data/command) GPIO"
+        default 17 if IDF_TARGET_ESP32
+        default 10 if IDF_TARGET_ESP32S3
+        depends on DC_LCD_ENABLE
+
+    config DC_LCD_PIN_RST
+        int "LCD RST (reset) GPIO"
+        default 2 if IDF_TARGET_ESP32
+        default 14 if IDF_TARGET_ESP32S3
+        depends on DC_LCD_ENABLE
+
+    config DC_LCD_PIN_CS
+        int "LCD CS (chip select) GPIO"
+        default 4 if IDF_TARGET_ESP32
+        default 13 if IDF_TARGET_ESP32S3
+        depends on DC_LCD_ENABLE
+
+endmenu
+
+menu "Data Collection - WiFi & MQTT"
+
+    config DC_WIFI_SSID
+        string "WiFi SSID"
+        default "your_wifi_ssid"
+        help
+            WiFi network name (SSID) to connect to.
+
+    config DC_WIFI_PASSWORD
+        string "WiFi Password"
+        default "your_wifi_password"
+        help
+            WiFi network password.
+
+    config DC_WIFI_MAX_RETRY
+        int "WiFi max retry"
+        default 5
+        help
+            Maximum number of WiFi connection retry attempts.
+
+    config DC_MQTT_BROKER_URI
+        string "MQTT Broker URI"
+        default "mqtts://broker.emqx.io:8883"
+        help
+            MQTT broker URI.  Default uses EMQX public test broker
+            with TLS on port 8883.
+
+    config DC_MQTT_CLIENT_ID
+        string "MQTT Client ID"
+        default "thermal_cylinder_esp32"
+        help
+            MQTT client identifier.  Must be unique per device if
+            multiple devices connect to the same broker.
+
+    config DC_MQTT_PUB_TOPIC
+        string "MQTT Publish Topic (sensor data)"
+        default "thermal_cylinder/esp32/sensors"
+        help
+            Topic to which sensor data JSON is published.
+
+    config DC_MQTT_SUB_TOPIC
+        string "MQTT Subscribe Topic (commands)"
+        default "thermal_cylinder/esp32/cmd"
+        help
+            Topic from which remote commands are received.
+
+endmenu
